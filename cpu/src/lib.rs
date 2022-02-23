@@ -8,6 +8,13 @@ use std::collections::VecDeque;
 // 3 : write reg1 to next addr
 // 4 : write reg2 to next addr
 // 5 : add reg1 and reg2 and store in reg1
+
+enum CPUState {
+    Hlt,
+    Executing(u8, u8),
+    Idle,
+}
+
 #[derive(Chip)]
 pub struct CPU {
     #[pin(output)]
@@ -22,7 +29,7 @@ pub struct CPU {
     io_latch: bool,
     reg1: u8,
     reg2: u8,
-    crr_instr: Option<(u8, u8)>,
+    state: CPUState,
     pub instr_cache: VecDeque<u8>,
 }
 
@@ -36,7 +43,7 @@ impl CPU {
             io_latch: true,
             reg1: 0,
             reg2: 0,
-            crr_instr: None,
+            state: CPUState::Idle,
             instr_cache: VecDeque::from_iter([1, 50, 2, 51, 5, 3, 52, 0, 0, 0]),
         }
     }
@@ -46,32 +53,19 @@ impl Chip for CPU {
     fn tick(&mut self) {
         // println!("reg1:{}\treg2:{}", self.reg1, self.reg2);
 
-        match &mut self.crr_instr {
-            Some((instr, ctr)) => {
-                if *ctr != 0 {
-                    *ctr -= 1;
-                    return;
-                }
-                match instr {
-                    0 => return,
-                    1 => self.reg1 = self.data_bus.unwrap(),
-                    2 => self.reg2 = self.data_bus.unwrap(),
-                    _ => {}
-                }
-                self.mem_active = false;
-                self.crr_instr = None;
-            }
-            None => {
+        match self.state {
+            CPUState::Hlt => return,
+            CPUState::Idle => {
                 if self.instr_cache.is_empty() {
                     self.mem_active = false;
                     self.read_mem = true;
-                    self.crr_instr = None;
+                    self.state = CPUState::Hlt;
                     return;
                 }
                 let instr = self.instr_cache.pop_front().unwrap();
                 self.mem_active = false;
                 match instr {
-                    0 => return,
+                    0 => self.state = CPUState::Hlt,
                     1 | 2 => {
                         let addr = self.instr_cache.pop_front().unwrap();
                         self.mem_active = true;
@@ -79,7 +73,7 @@ impl Chip for CPU {
                         self.addr_bus = addr;
                         self.data_bus = Some(0);
                         self.io_latch = true;
-                        self.crr_instr = Some((instr, 1));
+                        self.state = CPUState::Executing(1, instr);
                     }
                     3 => {
                         let addr = self.instr_cache.pop_front().unwrap();
@@ -103,6 +97,20 @@ impl Chip for CPU {
                     }
                     _ => {}
                 }
+            }
+            CPUState::Executing(ctr, instr) => {
+                if ctr != 0 {
+                    self.state = CPUState::Executing(ctr - 1, instr);
+                    return;
+                }
+                match instr {
+                    0 => return,
+                    1 => self.reg1 = self.data_bus.unwrap(),
+                    2 => self.reg2 = self.data_bus.unwrap(),
+                    _ => {}
+                }
+                self.mem_active = false;
+                self.state = CPUState::Idle;
             }
         }
     }
