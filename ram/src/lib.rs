@@ -12,7 +12,7 @@ pub struct Memory {
     is_read: bool,
 
     io_latch: bool,
-    mem: [u8; 255],
+    pub mem: [u8; 255],
 }
 
 impl Memory {
@@ -25,6 +25,17 @@ impl Memory {
             io_latch: true,
             mem: [0; 255],
         };
+        // code
+        t.mem[0] = 1;
+        t.mem[1] = 50;
+        t.mem[2] = 2;
+        t.mem[3] = 51;
+        t.mem[4] = 5;
+        t.mem[5] = 3;
+        t.mem[6] = 52;
+        t.mem[7] = 0;
+
+        // data
         t.mem[50] = 5;
         t.mem[51] = 7;
 
@@ -52,9 +63,9 @@ impl Chip for Memory {
             // println!("writing {} : {}", addr, val);
         }
 
-        println!(
-            "50:{}\t51:{}\t52:{}",
-            self.mem[50], self.mem[51], self.mem[52]
-        );
+        // println!(
+        //     "50:{}\t51:{}\t52:{}",
+        //     self.mem[50], self.mem[51], self.mem[52]
+        // );
     }
 }

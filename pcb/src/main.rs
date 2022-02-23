@@ -20,7 +20,21 @@ fn main() {
     let temp = temp.add_chip("cpu", cpu).add_chip("mem", mem);
     let mut pcb = temp.build().unwrap();
 
-    for _ in 0..10 {
+    // initial
+    let mem: &Memory = pcb.get_chip("mem").unwrap();
+    for addr in 50..55 {
+        print!("{}\t", mem.mem[addr]);
+    }
+    println!("");
+
+    for _ in 0..50 {
         pcb.tick();
     }
+
+    // after
+    let mem: &Memory = pcb.get_chip("mem").unwrap();
+    for addr in 50..55 {
+        print!("{}\t", mem.mem[addr]);
+    }
+    println!("");
 }

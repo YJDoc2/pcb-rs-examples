@@ -9,8 +9,18 @@ use std::collections::VecDeque;
 // 4 : write reg2 to next addr
 // 5 : add reg1 and reg2 and store in reg1
 
+const INSTRUCTION_CACHE_LENGTH: usize = 10;
+
+// the u8 stores ram address that is being fetched
+enum FetchState {
+    Priming, // need a better name to denote `this will start the fetch`
+    Blocked(u8),
+    Open(u8), //  give a better name to indicate `not-blocked on ram fetch`
+}
+
 enum CPUState {
     Hlt,
+    InstrFetch(FetchState),
     Executing(u8, u8),
     Idle,
 }
@@ -30,6 +40,7 @@ pub struct CPU {
     reg1: u8,
     reg2: u8,
     state: CPUState,
+    instr_ctr: u8,
     pub instr_cache: VecDeque<u8>,
 }
 
@@ -43,8 +54,9 @@ impl CPU {
             io_latch: true,
             reg1: 0,
             reg2: 0,
-            state: CPUState::Idle,
-            instr_cache: VecDeque::from_iter([1, 50, 2, 51, 5, 3, 52, 0, 0, 0]),
+            state: CPUState::InstrFetch(FetchState::Priming),
+            instr_ctr: 0,
+            instr_cache: VecDeque::new(),
         }
     }
 }
@@ -52,9 +64,53 @@ impl CPU {
 impl Chip for CPU {
     fn tick(&mut self) {
         // println!("reg1:{}\treg2:{}", self.reg1, self.reg2);
-
         match self.state {
             CPUState::Hlt => return,
+            CPUState::InstrFetch(ref state) => match state {
+                FetchState::Priming => {
+                    self.mem_active = true;
+                    self.read_mem = true;
+                    self.addr_bus = self.instr_ctr;
+                    self.data_bus = Some(0);
+                    self.io_latch = true;
+                    self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                }
+                FetchState::Blocked(addr) => {
+                    self.state = CPUState::InstrFetch(FetchState::Open(*addr));
+                    self.mem_active = false;
+                    self.read_mem = true;
+                }
+                FetchState::Open(addr) => {
+                    if self.instr_cache.len() < INSTRUCTION_CACHE_LENGTH {
+                        self.instr_cache.push_back(self.data_bus.unwrap());
+                        let next_addr = (addr + 1) % 255;
+                        self.mem_active = true;
+                        self.read_mem = true;
+                        self.addr_bus = (*addr + 1) % 255;
+                        self.data_bus = Some(0);
+                        self.io_latch = true;
+                        self.state = CPUState::InstrFetch(FetchState::Blocked(next_addr));
+                    } else {
+                        self.state = CPUState::Idle;
+                        self.mem_active = false;
+                        self.read_mem = true;
+                    }
+                }
+            },
+            CPUState::Executing(ctr, instr) => {
+                if ctr != 0 {
+                    self.state = CPUState::Executing(ctr - 1, instr);
+                    return;
+                }
+                match instr {
+                    0 => return,
+                    1 => self.reg1 = self.data_bus.unwrap(),
+                    2 => self.reg2 = self.data_bus.unwrap(),
+                    _ => {}
+                }
+                self.mem_active = false;
+                self.state = CPUState::Idle;
+            }
             CPUState::Idle => {
                 if self.instr_cache.is_empty() {
                     self.mem_active = false;
@@ -97,20 +153,6 @@ impl Chip for CPU {
                     }
                     _ => {}
                 }
-            }
-            CPUState::Executing(ctr, instr) => {
-                if ctr != 0 {
-                    self.state = CPUState::Executing(ctr - 1, instr);
-                    return;
-                }
-                match instr {
-                    0 => return,
-                    1 => self.reg1 = self.data_bus.unwrap(),
-                    2 => self.reg2 = self.data_bus.unwrap(),
-                    _ => {}
-                }
-                self.mem_active = false;
-                self.state = CPUState::Idle;
             }
         }
     }
