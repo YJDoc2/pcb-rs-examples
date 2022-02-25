@@ -27,7 +27,7 @@ fn main() {
     }
     println!("");
 
-    for _ in 0..100 {
+    for _ in 0..225 {
         pcb.tick();
     }
 
