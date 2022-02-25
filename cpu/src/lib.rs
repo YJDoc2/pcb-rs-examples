@@ -2,19 +2,24 @@ use pcb_rs::Chip;
 use std::collections::VecDeque;
 
 // instructions are :
+
 // 0 : stop
+
 // 1 : read next byte addr and store in reg1
 // 2 : read next byte addr and store in reg2
 // 3 : write reg1 to next addr
 // 4 : write reg2 to next addr
-// 5 : add reg1 and reg2 and store in reg1
-// 6 : add next byte to reg1
-// 7 : sub reg2 from reg1 and store in reg1
-// 8 : sub next byte from reg1
-// 9 : store next byte in reg1
-// 10 : store next byte in reg 2
-// 11 : read next byte as addr, and store next-to-next byte at addr
-// 12 : xchg
+
+// 5 : store next byte in reg1
+// 6 : store next byte in reg 2
+// 7 : read next byte as addr, and store next-to-next byte at addr
+// 8 : xchg
+
+// 9 : add reg1 and reg2 and store in reg1
+// 10 : add next byte to reg1
+// 11 : sub reg2 from reg1 and store in reg1
+// 12 : sub next byte from reg1
+
 // 13 : jump to next byte if zero
 // 14 : jump to next byte if not zero
 // 15 : jump if reg1 less than reg2
@@ -193,10 +198,35 @@ impl Chip for CPU {
                         self.data_bus = Some(self.reg2);
                         self.instr_ctr += 1; // addr byte
                     }
-                    5 => {
+                    9 => {
                         self.reg1 += self.reg2;
                         self.set_flags();
                     }
+                    10 => {
+                        if self.instr_cache.len() < 1 {
+                            self.queue_ram_fetch(self.instr_ctr);
+                            self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                        }
+                        let v = self.instr_cache.pop_front().unwrap();
+                        self.reg1 += v;
+                        self.set_flags();
+                        self.instr_ctr += 1;
+                    }
+                    11 => {
+                        self.reg1 -= self.reg2;
+                        self.set_flags();
+                    }
+                    12 => {
+                        if self.instr_cache.len() < 1 {
+                            self.queue_ram_fetch(self.instr_ctr);
+                            self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                        }
+                        let v = self.instr_cache.pop_front().unwrap();
+                        self.reg1 -= v;
+                        self.set_flags();
+                        self.instr_ctr += 1;
+                    }
+
                     _ => {}
                 }
             }
