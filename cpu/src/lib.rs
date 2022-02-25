@@ -25,6 +25,8 @@ use std::collections::VecDeque;
 // 15 : jump if reg1 less than reg2
 // 16 : jump if reg1 greater than reg2
 
+// 255 : nop
+
 // TODO
 // port these to compiler.js as well
 
@@ -293,6 +295,9 @@ impl Chip for CPU {
                             return;
                         }
                         self.instr_ctr += 1;
+                    }
+                    255 => {
+                        // nop
                     }
 
                     _ => {}
