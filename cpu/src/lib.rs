@@ -8,6 +8,20 @@ use std::collections::VecDeque;
 // 3 : write reg1 to next addr
 // 4 : write reg2 to next addr
 // 5 : add reg1 and reg2 and store in reg1
+// 6 : add next byte to reg1
+// 7 : sub reg2 from reg1 and store in reg1
+// 8 : sub next byte from reg1
+// 9 : store next byte in reg1
+// 10 : store next byte in reg 2
+// 11 : read next byte as addr, and store next-to-next byte at addr
+// 12 : xchg
+// 13 : jump to next byte if zero
+// 14 : jump to next byte if not zero
+// 15 : jump if reg1 less than reg2
+// 16 : jump if reg1 greater than reg2
+
+// TODO
+// port these to compiler.js as well
 
 const INSTRUCTION_CACHE_LENGTH: usize = 10;
 
@@ -37,11 +51,15 @@ pub struct CPU {
     read_mem: bool,
 
     io_latch: bool,
-    reg1: u8,
-    reg2: u8,
     state: CPUState,
     instr_ctr: u8,
-    pub instr_cache: VecDeque<u8>,
+    instr_cache: VecDeque<u8>,
+
+    reg1: u8,
+    reg2: u8,
+    zero: bool,
+    gt: bool,
+    lt: bool,
 }
 
 impl CPU {
@@ -52,11 +70,34 @@ impl CPU {
             mem_active: false,
             read_mem: true,
             io_latch: true,
-            reg1: 0,
-            reg2: 0,
             state: CPUState::InstrFetch(FetchState::Priming),
             instr_ctr: 0,
             instr_cache: VecDeque::new(),
+            reg1: 0,
+            reg2: 0,
+            zero: false,
+            gt: false,
+            lt: false,
+        }
+    }
+
+    fn queue_ram_fetch(&mut self, addr: u8) {
+        self.mem_active = true;
+        self.read_mem = true;
+        self.addr_bus = addr;
+        self.data_bus = Some(0);
+        self.io_latch = true;
+    }
+
+    fn set_flags(&mut self) {
+        if self.reg1 == 0 {
+            self.zero = true;
+        }
+        if self.reg1 < self.reg2 {
+            self.lt = true;
+        }
+        if self.reg1 > self.reg2 {
+            self.gt = true;
         }
     }
 }
@@ -68,11 +109,7 @@ impl Chip for CPU {
             CPUState::Hlt => return,
             CPUState::InstrFetch(ref state) => match state {
                 FetchState::Priming => {
-                    self.mem_active = true;
-                    self.read_mem = true;
-                    self.addr_bus = self.instr_ctr;
-                    self.data_bus = Some(0);
-                    self.io_latch = true;
+                    self.queue_ram_fetch(self.instr_ctr);
                     self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
                 }
                 FetchState::Blocked(addr) => {
@@ -84,11 +121,7 @@ impl Chip for CPU {
                     if self.instr_cache.len() < INSTRUCTION_CACHE_LENGTH {
                         self.instr_cache.push_back(self.data_bus.unwrap());
                         let next_addr = (addr + 1) % 255;
-                        self.mem_active = true;
-                        self.read_mem = true;
-                        self.addr_bus = (*addr + 1) % 255;
-                        self.data_bus = Some(0);
-                        self.io_latch = true;
+                        self.queue_ram_fetch(next_addr);
                         self.state = CPUState::InstrFetch(FetchState::Blocked(next_addr));
                     } else {
                         self.state = CPUState::Idle;
@@ -113,43 +146,56 @@ impl Chip for CPU {
             }
             CPUState::Idle => {
                 if self.instr_cache.is_empty() {
-                    self.mem_active = false;
-                    self.read_mem = true;
-                    self.state = CPUState::Hlt;
+                    // cache is empty, so prime fetch
+                    self.queue_ram_fetch(self.instr_ctr);
+                    self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
                     return;
                 }
+                // this unwrap will not fail
                 let instr = self.instr_cache.pop_front().unwrap();
+                self.instr_ctr += 1;
                 self.mem_active = false;
                 match instr {
                     0 => self.state = CPUState::Hlt,
                     1 | 2 => {
+                        if self.instr_cache.len() < 1 {
+                            self.queue_ram_fetch(self.instr_ctr);
+                            self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                        }
                         let addr = self.instr_cache.pop_front().unwrap();
-                        self.mem_active = true;
-                        self.read_mem = true;
-                        self.addr_bus = addr;
-                        self.data_bus = Some(0);
-                        self.io_latch = true;
+                        self.queue_ram_fetch(addr);
                         self.state = CPUState::Executing(1, instr);
+                        self.instr_ctr += 1; // addr byte
                     }
                     3 => {
+                        if self.instr_cache.len() < 1 {
+                            self.queue_ram_fetch(self.instr_ctr);
+                            self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                        }
                         let addr = self.instr_cache.pop_front().unwrap();
                         self.addr_bus = addr;
                         self.mem_active = true;
                         self.read_mem = false;
                         self.io_latch = false;
                         self.data_bus = Some(self.reg1);
+                        self.instr_ctr += 1; // addr byte
                     }
                     4 => {
+                        if self.instr_cache.len() < 1 {
+                            self.queue_ram_fetch(self.instr_ctr);
+                            self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                        }
                         let addr = self.instr_cache.pop_front().unwrap();
                         self.addr_bus = addr;
                         self.mem_active = true;
                         self.read_mem = false;
-                        // self.io_latch = false;
+                        self.io_latch = false;
                         self.data_bus = Some(self.reg2);
+                        self.instr_ctr += 1; // addr byte
                     }
                     5 => {
                         self.reg1 += self.reg2;
-                        // println!("reg1 = {}", self.reg1);
+                        self.set_flags();
                     }
                     _ => {}
                 }
