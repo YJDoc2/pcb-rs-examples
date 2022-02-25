@@ -166,6 +166,7 @@ impl Chip for CPU {
                         if self.instr_cache.len() < 1 {
                             self.queue_ram_fetch(self.instr_ctr);
                             self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                            return;
                         }
                         let addr = self.instr_cache.pop_front().unwrap();
                         self.queue_ram_fetch(addr);
@@ -176,6 +177,7 @@ impl Chip for CPU {
                         if self.instr_cache.len() < 1 {
                             self.queue_ram_fetch(self.instr_ctr);
                             self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                            return;
                         }
                         let addr = self.instr_cache.pop_front().unwrap();
                         self.addr_bus = addr;
@@ -189,6 +191,7 @@ impl Chip for CPU {
                         if self.instr_cache.len() < 1 {
                             self.queue_ram_fetch(self.instr_ctr);
                             self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                            return;
                         }
                         let addr = self.instr_cache.pop_front().unwrap();
                         self.addr_bus = addr;
@@ -202,6 +205,7 @@ impl Chip for CPU {
                         if self.instr_cache.len() < 1 {
                             self.queue_ram_fetch(self.instr_ctr);
                             self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                            return;
                         }
                         let v = self.instr_cache.pop_front().unwrap();
                         self.reg1 = v;
@@ -211,6 +215,7 @@ impl Chip for CPU {
                         if self.instr_cache.len() < 1 {
                             self.queue_ram_fetch(self.instr_ctr);
                             self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                            return;
                         }
                         let v = self.instr_cache.pop_front().unwrap();
                         self.reg2 = v;
@@ -220,6 +225,7 @@ impl Chip for CPU {
                         if self.instr_cache.len() < 2 {
                             self.queue_ram_fetch(self.instr_ctr);
                             self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                            return;
                         }
                         let addr = self.instr_cache.pop_front().unwrap();
                         let v = self.instr_cache.pop_front().unwrap();
@@ -243,6 +249,7 @@ impl Chip for CPU {
                         if self.instr_cache.len() < 1 {
                             self.queue_ram_fetch(self.instr_ctr);
                             self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                            return;
                         }
                         let v = self.instr_cache.pop_front().unwrap();
                         self.reg1 += v;
@@ -257,10 +264,34 @@ impl Chip for CPU {
                         if self.instr_cache.len() < 1 {
                             self.queue_ram_fetch(self.instr_ctr);
                             self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                            return;
                         }
                         let v = self.instr_cache.pop_front().unwrap();
                         self.reg1 -= v;
                         self.set_flags();
+                        self.instr_ctr += 1;
+                    }
+                    13 | 14 | 15 | 16 => {
+                        if self.instr_cache.len() < 1 {
+                            self.queue_ram_fetch(self.instr_ctr);
+                            self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                            return;
+                        }
+                        let addr = self.instr_cache.pop_front().unwrap();
+                        let jump;
+                        match instr {
+                            13 => jump = self.zero,
+                            14 => jump = !self.zero,
+                            15 => jump = self.lt,
+                            16 => jump = self.gt,
+                            _ => unreachable!(),
+                        }
+                        if jump {
+                            self.queue_ram_fetch(addr);
+                            self.state = CPUState::InstrFetch(FetchState::Blocked(addr));
+                            self.instr_ctr = addr;
+                            return;
+                        }
                         self.instr_ctr += 1;
                     }
 
