@@ -97,15 +97,11 @@ impl CPU {
     }
 
     fn set_flags(&mut self) {
-        if self.reg1 == 0 {
-            self.zero = true;
-        }
-        if self.reg1 < self.reg2 {
-            self.lt = true;
-        }
-        if self.reg1 > self.reg2 {
-            self.gt = true;
-        }
+        self.zero = self.reg1 == 0;
+
+        self.lt = self.reg1 < self.reg2;
+
+        self.gt = self.reg1 > self.reg2;
     }
 }
 
@@ -166,6 +162,7 @@ impl Chip for CPU {
                     1 | 2 => {
                         if self.instr_cache.len() < 1 {
                             self.queue_ram_fetch(self.instr_ctr);
+                            self.instr_cache.clear();
                             self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
                             return;
                         }
@@ -177,6 +174,7 @@ impl Chip for CPU {
                     3 => {
                         if self.instr_cache.len() < 1 {
                             self.queue_ram_fetch(self.instr_ctr);
+                            self.instr_cache.clear();
                             self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
                             return;
                         }
@@ -191,6 +189,7 @@ impl Chip for CPU {
                     4 => {
                         if self.instr_cache.len() < 1 {
                             self.queue_ram_fetch(self.instr_ctr);
+                            self.instr_cache.clear();
                             self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
                             return;
                         }
@@ -205,6 +204,7 @@ impl Chip for CPU {
                     5 => {
                         if self.instr_cache.len() < 1 {
                             self.queue_ram_fetch(self.instr_ctr);
+                            self.instr_cache.clear();
                             self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
                             return;
                         }
@@ -215,6 +215,7 @@ impl Chip for CPU {
                     6 => {
                         if self.instr_cache.len() < 1 {
                             self.queue_ram_fetch(self.instr_ctr);
+                            self.instr_cache.clear();
                             self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
                             return;
                         }
@@ -225,6 +226,7 @@ impl Chip for CPU {
                     7 => {
                         if self.instr_cache.len() < 2 {
                             self.queue_ram_fetch(self.instr_ctr);
+                            self.instr_cache.clear();
                             self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
                             return;
                         }
@@ -249,6 +251,7 @@ impl Chip for CPU {
                     10 => {
                         if self.instr_cache.len() < 1 {
                             self.queue_ram_fetch(self.instr_ctr);
+                            self.instr_cache.clear();
                             self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
                             return;
                         }
@@ -264,6 +267,7 @@ impl Chip for CPU {
                     12 => {
                         if self.instr_cache.len() < 1 {
                             self.queue_ram_fetch(self.instr_ctr);
+                            self.instr_cache.clear();
                             self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
                             return;
                         }
@@ -275,6 +279,7 @@ impl Chip for CPU {
                     13 | 14 | 15 | 16 => {
                         if self.instr_cache.len() < 1 {
                             self.queue_ram_fetch(self.instr_ctr);
+                            self.instr_cache.clear();
                             self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
                             return;
                         }
@@ -287,8 +292,10 @@ impl Chip for CPU {
                             16 => jump = self.gt,
                             _ => unreachable!(),
                         }
+
                         if jump {
                             self.queue_ram_fetch(addr);
+                            self.instr_cache.clear();
                             self.state = CPUState::InstrFetch(FetchState::Blocked(addr));
                             self.instr_ctr = addr;
                             return;
