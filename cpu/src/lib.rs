@@ -11,7 +11,7 @@ use std::collections::VecDeque;
 // 4 : write reg2 to next addr
 
 // 5 : store next byte in reg1
-// 6 : store next byte in reg 2
+// 6 : store next byte in reg2
 // 7 : read next byte as addr, and store next-to-next byte at addr
 // 8 : xchg
 
@@ -197,6 +197,43 @@ impl Chip for CPU {
                         self.io_latch = false;
                         self.data_bus = Some(self.reg2);
                         self.instr_ctr += 1; // addr byte
+                    }
+                    5 => {
+                        if self.instr_cache.len() < 1 {
+                            self.queue_ram_fetch(self.instr_ctr);
+                            self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                        }
+                        let v = self.instr_cache.pop_front().unwrap();
+                        self.reg1 = v;
+                        self.instr_ctr += 1;
+                    }
+                    6 => {
+                        if self.instr_cache.len() < 1 {
+                            self.queue_ram_fetch(self.instr_ctr);
+                            self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                        }
+                        let v = self.instr_cache.pop_front().unwrap();
+                        self.reg2 = v;
+                        self.instr_ctr += 1;
+                    }
+                    7 => {
+                        if self.instr_cache.len() < 2 {
+                            self.queue_ram_fetch(self.instr_ctr);
+                            self.state = CPUState::InstrFetch(FetchState::Blocked(self.instr_ctr));
+                        }
+                        let addr = self.instr_cache.pop_front().unwrap();
+                        let v = self.instr_cache.pop_front().unwrap();
+                        self.addr_bus = addr;
+                        self.mem_active = true;
+                        self.read_mem = false;
+                        self.io_latch = false;
+                        self.data_bus = Some(v);
+                        self.instr_ctr += 2; //  1 addr + 1 value
+                    }
+                    8 => {
+                        let t = self.reg1;
+                        self.reg1 = self.reg2;
+                        self.reg2 = t;
                     }
                     9 => {
                         self.reg1 += self.reg2;
