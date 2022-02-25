@@ -26,14 +26,10 @@ impl Memory {
             mem: [0; 255],
         };
         // code
-        t.mem[0] = 1;
-        t.mem[1] = 50;
-        t.mem[2] = 2;
-        t.mem[3] = 51;
-        t.mem[4] = 5;
-        t.mem[5] = 3;
-        t.mem[6] = 52;
-        t.mem[7] = 0;
+        let instr = [255, 255, 255, 255, 255, 5, 55, 7, 52, 57];
+        for (m, i) in t.mem.iter_mut().zip(instr.iter()) {
+            *m = *i;
+        }
 
         // data
         t.mem[50] = 5;

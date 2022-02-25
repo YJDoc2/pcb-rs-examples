@@ -30,7 +30,7 @@ use std::collections::VecDeque;
 // TODO
 // port these to compiler.js as well
 
-const INSTRUCTION_CACHE_LENGTH: usize = 10;
+const INSTRUCTION_CACHE_LENGTH: usize = 8;
 
 // the u8 stores ram address that is being fetched
 enum FetchState {
@@ -160,7 +160,6 @@ impl Chip for CPU {
                 }
                 // this unwrap will not fail
                 let instr = self.instr_cache.pop_front().unwrap();
-                self.instr_ctr += 1;
                 self.mem_active = false;
                 match instr {
                     0 => self.state = CPUState::Hlt,
@@ -302,6 +301,11 @@ impl Chip for CPU {
 
                     _ => {}
                 }
+                // this accounts for instruction byte
+                // this is after the match, as if we have an incomplete instruction, the
+                // instr_ctr must be set to the value of instruction byte
+                // eg if add immediate is at 51, and cache is empty, the cache fill needs to fill from 51, not 52
+                self.instr_ctr += 1;
             }
         }
     }
