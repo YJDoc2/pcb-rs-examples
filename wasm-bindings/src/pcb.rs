@@ -1,7 +1,8 @@
 use wasm_bindgen::prelude::*;
 
 use cpu::CPU;
-use pcb_rs::{pcb, Chip};
+#[allow(unused_imports)]
+use pcb_rs::{pcb, Chip}; // traits need to be imported to use the trait methods
 use ram::Memory;
 
 pcb!(PCB{
@@ -27,7 +28,7 @@ pub struct CPUStateData {
     pub mem_active: bool,
     pub read_mem: bool,
     pub io_latch: bool,
-    pub instr_ctr: u8,
+    pub instr_ptr: u8,
     pub reg1: u8,
     pub reg2: u8,
     pub zero: bool,
@@ -63,7 +64,7 @@ impl PCBHandle {
             mem_active: data.mem_active,
             read_mem: data.read_mem,
             io_latch: data.io_latch,
-            instr_ctr: data.instr_ctr,
+            instr_ptr: data.instr_ptr,
             reg1: data.reg1,
             reg2: data.reg2,
             zero: data.zero,
