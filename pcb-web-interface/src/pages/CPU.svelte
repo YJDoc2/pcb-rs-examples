@@ -1,7 +1,9 @@
 <script>
   import { Grid, Row, Column } from 'carbon-components-svelte';
   import { Tile, TextArea, Button } from 'carbon-components-svelte';
-  export let cpu;
+  import { onMount } from 'svelte';
+
+  export let pcb;
 
   let compileErr = false;
   let compileErrText = '';
@@ -43,6 +45,14 @@
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 1,
   ];
+
+  onMount(() => {
+    console.log(pcb.get_cpu_state());
+    console.log(pcb.get_cpu_reg_flags());
+    console.log(pcb.get_cpu_instr_cache());
+    console.log(pcb.get_ram_state());
+    console.log(pcb.get_mem_array());
+  });
 </script>
 
 <Grid padding={false}>

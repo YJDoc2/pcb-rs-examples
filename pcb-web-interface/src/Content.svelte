@@ -5,7 +5,7 @@
 
   export let page;
   export let bindings;
-  let cpu = bindings.greet; // TODO get cpu from binding and use it to populate
+  let pcb = bindings.get_pcb_handle();
 </script>
 
 <Content>
@@ -14,7 +14,7 @@
   {:else if page == constants.INFO_PAGE}
     <h1>Info Page</h1>
   {:else if page == constants.CPU_PAGE}
-    <CPU {cpu} />
+    <CPU {pcb} />
   {:else if page == constants.ADDER_PAGE}
     <h1>Adder page</h1>
   {:else if page == constants.GATES_PAGE}

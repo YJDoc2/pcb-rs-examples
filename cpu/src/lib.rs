@@ -33,17 +33,34 @@ use std::collections::VecDeque;
 const INSTRUCTION_CACHE_LENGTH: usize = 8;
 
 // the u8 stores ram address that is being fetched
+#[derive(Debug)]
 enum FetchState {
     Priming, // need a better name to denote `this will start the fetch`
     Blocked(u8),
     Open(u8), //  give a better name to indicate `not-blocked on ram fetch`
 }
 
+#[derive(Debug)]
 enum CPUState {
     Hlt,
     InstrFetch(FetchState),
     Executing(u8, u8),
     Idle,
+}
+
+// mainly for wasm binding
+pub struct CPUFlagReg {
+    pub addr_bus: u8,
+    pub data_bus: Option<u8>,
+    pub mem_active: bool,
+    pub read_mem: bool,
+    pub io_latch: bool,
+    pub instr_ctr: u8,
+    pub reg1: u8,
+    pub reg2: u8,
+    pub zero: bool,
+    pub gt: bool,
+    pub lt: bool,
 }
 
 #[derive(Chip)]
@@ -86,6 +103,31 @@ impl CPU {
             gt: false,
             lt: false,
         }
+    }
+
+    // for wasm binding
+    pub fn get_reg_flags(&self) -> CPUFlagReg {
+        CPUFlagReg {
+            addr_bus: self.addr_bus,
+            data_bus: self.data_bus,
+            mem_active: self.mem_active,
+            read_mem: self.read_mem,
+            io_latch: self.io_latch,
+            instr_ctr: self.instr_ctr,
+            reg1: self.reg1,
+            reg2: self.reg2,
+            zero: self.zero,
+            gt: self.gt,
+            lt: self.lt,
+        }
+    }
+
+    pub fn get_instr_cache(&self) -> Vec<u8> {
+        Vec::from(self.instr_cache.clone())
+    }
+
+    pub fn get_state(&self) -> String {
+        format!("{:?}", self.state)
     }
 
     fn queue_ram_fetch(&mut self, addr: u8) {

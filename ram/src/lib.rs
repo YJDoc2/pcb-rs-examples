@@ -15,6 +15,14 @@ pub struct Memory {
     pub mem: [u8; 255],
 }
 
+pub struct MemState {
+    pub addr: u8,
+    pub data: Option<u8>,
+    pub is_active: bool,
+    pub is_read: bool,
+    pub io_latch: bool,
+}
+
 impl Memory {
     pub fn new() -> Self {
         let mut t = Memory {
@@ -37,6 +45,22 @@ impl Memory {
         t.mem[51] = 7;
 
         t
+    }
+
+    // for wasm binding
+    pub fn get_state(&self) -> MemState {
+        MemState {
+            addr: self.addr,
+            data: self.data,
+            is_active: self.is_active,
+            is_read: self.is_read,
+            io_latch: self.io_latch,
+        }
+    }
+
+    // for wasm binding
+    pub fn get_mem_array(&self) -> Vec<u8> {
+        Vec::from_iter(self.mem.iter().map(|x| *x))
     }
 }
 
