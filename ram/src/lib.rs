@@ -12,7 +12,7 @@ pub struct Memory {
     is_read: bool,
 
     io_latch: bool,
-    pub mem: [u8; 255],
+    pub mem: [u8; 256],
 }
 
 pub struct MemState {
@@ -31,7 +31,7 @@ impl Memory {
             is_active: false,
             is_read: false,
             io_latch: true,
-            mem: [0; 255],
+            mem: [0; 256],
         };
         // code
         // let instr = [255, 255, 255, 255, 255, 5, 55, 7, 52, 57];

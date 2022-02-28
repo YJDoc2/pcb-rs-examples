@@ -165,7 +165,7 @@ impl Chip for CPU {
                 FetchState::Open(addr) => {
                     if self.instr_cache.len() < INSTRUCTION_CACHE_LENGTH {
                         self.instr_cache.push_back(self.data_bus.unwrap());
-                        let next_addr = (addr + 1) % 255;
+                        let next_addr = addr.wrapping_add(1);
                         self.queue_ram_fetch(next_addr);
                         self.state = CPUState::InstrFetch(FetchState::Blocked(next_addr));
                     } else {
