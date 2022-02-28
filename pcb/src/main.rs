@@ -14,7 +14,18 @@ pcb!(PCB{
 });
 
 fn main() {
-    let mem = Box::new(Memory::new());
+    let mut mem = Box::new(Memory::new());
+
+    // code
+    // let instr = [255, 255, 255, 255, 255, 5, 55, 7, 52, 57];
+    let instr = [5, 0, 6, 5, 9, 8, 12, 1, 13, 13, 8, 14, 4, 8, 3, 52, 0];
+    for (m, i) in mem.mem.iter_mut().zip(instr.iter()) {
+        *m = *i;
+    }
+    // data
+    mem.mem[50] = 5;
+    mem.mem[51] = 7;
+
     let cpu = Box::new(CPU::new());
     let temp = PCBBuilder::new();
     let temp = temp.add_chip("cpu", cpu).add_chip("mem", mem);
