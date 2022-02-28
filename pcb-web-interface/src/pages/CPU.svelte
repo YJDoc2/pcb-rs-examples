@@ -20,7 +20,7 @@
 
   let reg1 = 5;
   let reg2 = 7;
-  let instr_ctr = 2;
+  let instr_ptr = 2;
   let zero = false;
   let lt = true;
   let gt = false;
@@ -46,12 +46,36 @@
     0, 0, 0, 0, 0, 1,
   ];
 
+  function set_state() {
+    cpu_state = pcb.get_cpu_state();
+    let cpu_reg_flags = pcb.get_cpu_reg_flags();
+    addr_bus = cpu_reg_flags.addr;
+    data_bus = cpu_reg_flags.data || 'Tristated';
+    mem_active = cpu_reg_flags.mem_active;
+    read_mem = cpu_reg_flags.read_mem;
+    io_latch = cpu_reg_flags.io_latch;
+
+    reg1 = cpu_reg_flags.reg1;
+    reg2 = cpu_reg_flags.reg2;
+    instr_ptr = cpu_reg_flags.instr_ptr;
+    zero = cpu_reg_flags.zero;
+    lt = cpu_reg_flags.lt;
+    gt = cpu_reg_flags.gt;
+    instr_cache = pcb.get_cpu_instr_cache();
+
+    let ram_state = pcb.get_ram_state();
+
+    ram_addr = ram_state.addr;
+    ram_data = ram_state.data || 'Tristated';
+    ram_active = ram_state.is_active;
+    ram_read = ram_state.is_read;
+    ram_latch = ram_state.io_latch;
+
+    mem = pcb.get_mem_array();
+  }
+
   onMount(() => {
-    console.log(pcb.get_cpu_state());
-    console.log(pcb.get_cpu_reg_flags());
-    console.log(pcb.get_cpu_instr_cache());
-    console.log(pcb.get_ram_state());
-    console.log(pcb.get_mem_array());
+    set_state();
   });
 </script>
 
@@ -81,7 +105,7 @@
               <hr />
               <h5>Register B : {reg2}</h5>
               <hr />
-              <h5>Instruction Counter : {instr_ctr}</h5>
+              <h5>Instruction Pointer : {instr_ptr}</h5>
               <hr />
               <h5>Zero Flag : {zero}</h5>
               <hr />
@@ -121,7 +145,7 @@
         <div class="row-separator" />
         {#each Array(16) as _, i}
           {#each Array(16) as _, j}
-            <div class="cell">{mem[i * 16 + j]}</div>
+            <div class="cell">{String(mem[i * 16 + j]).padStart(3, '0')}</div>
           {/each}
           <br />
           <div class="row-separator" />
