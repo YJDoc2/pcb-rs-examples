@@ -1,11 +1,12 @@
 <script>
   import { Grid, Row, Column } from 'carbon-components-svelte';
   import { Tile, TextArea, Button } from 'carbon-components-svelte';
+  import compile from './compiler';
   import { onMount } from 'svelte';
 
   export let pcb;
 
-  let compileErr = false;
+  let compileErr = false; // need this for textarea
   let compileErrText = '';
   let code = '';
   let disabled = false;
@@ -46,6 +47,38 @@
     0, 0, 0, 0, 0, 1,
   ];
 
+  onMount(() => {
+    set_state();
+  });
+
+  function load() {
+    try {
+      let asm = compile(code);
+      pcb.load(asm);
+      compiled = true;
+      compileErr = false;
+      compileErrText = '';
+      set_state();
+    } catch (err) {
+      compileErr = true;
+      compileErrText = err;
+      disabled = true;
+      console.log(err);
+    }
+  }
+
+  function tick() {
+    if (!compiled) {
+      return;
+    }
+    // disable next button in case, but this might trigger re-render,
+    // so would be better is svelte by-default de-bounces clicks
+    disabled = true;
+    pcb.tick();
+    set_state();
+    disabled = false;
+  }
+
   function set_state() {
     cpu_state = pcb.get_cpu_state();
     let cpu_reg_flags = pcb.get_cpu_reg_flags();
@@ -73,10 +106,6 @@
 
     mem = pcb.get_mem_array();
   }
-
-  onMount(() => {
-    set_state();
-  });
 </script>
 
 <Grid padding={false}>
@@ -160,11 +189,12 @@
         bind:value={code}
       />
       <br />
-      <Button size="field" kind="danger">Load</Button>
+      <Button size="field" kind="danger" on:click={load}>Load</Button>
       <Button
         size="field"
         kind="tertiary"
-        disabled={disabled || !compiled || compileErr}>Next</Button
+        disabled={disabled || !compiled}
+        on:click={tick}>Next</Button
       >
     </Column>
   </Row>

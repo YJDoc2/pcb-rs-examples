@@ -89,6 +89,17 @@ impl PCBHandle {
         let ram: &Memory = self.pcb.get_chip("mem").unwrap();
         ram.get_mem_array()
     }
+
+    pub fn tick(&mut self) {
+        self.pcb.tick();
+    }
+
+    pub fn load(&mut self, asm: &[u8]) {
+        let ram: &mut Memory = self.pcb.get_chip_mut("mem").unwrap();
+        for (m, i) in ram.mem.iter_mut().zip(asm.iter()) {
+            *m = *i;
+        }
+    }
 }
 
 #[wasm_bindgen]

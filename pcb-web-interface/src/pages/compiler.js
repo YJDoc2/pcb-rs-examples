@@ -36,7 +36,7 @@ function get_num(s) {
   return v;
 }
 
-function compile(code) {
+export default function compile(code) {
   let _code = code.toLowerCase();
   let codelines = _code.split('\n');
   let compiled = [];
@@ -200,4 +200,4 @@ xchg
 mov 52 a
 hlt
 `;
-console.log(compile(code));
+// console.log(compile(code));
