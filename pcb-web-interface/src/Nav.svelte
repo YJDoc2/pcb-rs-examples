@@ -30,6 +30,12 @@
       }}
     />
     <SideNavLink
+      text="Gates"
+      on:click={() => {
+        page = constants.GATES_PAGE;
+      }}
+    />
+    <SideNavLink
       text="CPU PCB"
       on:click={() => {
         page = constants.CPU_PAGE;
@@ -39,12 +45,6 @@
       text="Adder"
       on:click={() => {
         page = constants.ADDER_PAGE;
-      }}
-    />
-    <SideNavLink
-      text="Gates"
-      on:click={() => {
-        page = constants.GATES_PAGE;
       }}
     />
     <SideNavLink
