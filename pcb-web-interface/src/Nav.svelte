@@ -36,6 +36,12 @@
       }}
     />
     <SideNavLink
+      text="Ripple Adder"
+      on:click={() => {
+        page = constants.RIPPLE_ADDER_PAGE;
+      }}
+    />
+    <SideNavLink
       text="CPU PCB"
       on:click={() => {
         page = constants.CPU_PAGE;

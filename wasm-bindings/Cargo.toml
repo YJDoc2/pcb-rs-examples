@@ -12,6 +12,7 @@ wasm-bindgen = "0.2.63"
 cpu = {path="../cpu"}
 ram = {path="../ram"}
 basic-gates = {path="../basic-gates"}
+ripple-carry-adder = {path="../ripple-carry-adder"}
 pcb-rs = {path="../../pcb-rs/pcb-rs"}
 
 

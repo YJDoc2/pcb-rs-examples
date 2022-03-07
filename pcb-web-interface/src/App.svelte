@@ -1,10 +1,10 @@
 <script>
   export let bindings;
-  import { HOME_PAGE, GATES_PAGE } from './constants';
+  import { HOME_PAGE, RIPPLE_ADDER_PAGE } from './constants';
   import Nav from './Nav.svelte';
   import Content from './Content.svelte';
 
-  let page = GATES_PAGE;
+  let page = RIPPLE_ADDER_PAGE;
 </script>
 
 <Nav bind:page />
