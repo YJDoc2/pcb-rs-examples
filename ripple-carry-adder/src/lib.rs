@@ -11,22 +11,22 @@ pcb!(RippleAdder{
     fa2::carry - fa3::cin;
     fa3::carry - fa4::cin;
 
-    expose fa1::bit1 as a1;
-    expose fa2::bit1 as a2;
-    expose fa3::bit1 as a3;
-    expose fa4::bit1 as a4;
+    expose fa1::bit1 as a0;
+    expose fa2::bit1 as a1;
+    expose fa3::bit1 as a2;
+    expose fa4::bit1 as a3;
 
-    expose fa1::bit2 as b1;
-    expose fa2::bit2 as b2;
-    expose fa3::bit2 as b3;
-    expose fa4::bit2 as b4;
+    expose fa1::bit2 as b0;
+    expose fa2::bit2 as b1;
+    expose fa3::bit2 as b2;
+    expose fa4::bit2 as b3;
 
     expose fa1::cin as cin;
 
-    expose fa1::sum as s1;
-    expose fa2::sum as s2;
-    expose fa3::sum as s3;
-    expose fa4::sum as s4;
+    expose fa1::sum as s0;
+    expose fa2::sum as s1;
+    expose fa3::sum as s2;
+    expose fa4::sum as s3;
 
     expose fa4::carry as carry;
 });
