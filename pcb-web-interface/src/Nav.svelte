@@ -42,6 +42,12 @@
       }}
     />
     <SideNavLink
+      text="Carry Look Ahead Adder"
+      on:click={() => {
+        page = constants.CLA_ADDER_PAGE;
+      }}
+    />
+    <SideNavLink
       text="CPU PCB"
       on:click={() => {
         page = constants.CPU_PAGE;
