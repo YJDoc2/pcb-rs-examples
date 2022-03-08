@@ -22,6 +22,7 @@ pcb!(FullAdder{
 
     expose xor2::out as sum;
     expose or1::out as carry;
+    expose xor1::out as p;
 
 
 });
