@@ -54,12 +54,6 @@
       }}
     />
     <SideNavLink
-      text="Adder"
-      on:click={() => {
-        page = constants.ADDER_PAGE;
-      }}
-    />
-    <SideNavLink
       text="Ring Counter"
       on:click={() => {
         page = constants.RING_COUNTER_PAGE;
