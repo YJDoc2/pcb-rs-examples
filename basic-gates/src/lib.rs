@@ -181,3 +181,35 @@ impl pcb_rs::Chip for Or5 {
         self.out = self.in1 || self.in2 || self.in3 || self.in4 || self.in5;
     }
 }
+
+#[derive(Chip, Default)]
+pub struct NorGate {
+    #[pin(input)]
+    pub in1: bool,
+    #[pin(input)]
+    pub in2: bool,
+    #[pin(output)]
+    pub out: bool,
+}
+
+impl pcb_rs::Chip for NorGate {
+    fn tick(&mut self) {
+        self.out = !self.in1 && !self.in2;
+    }
+}
+
+#[derive(Chip, Default)]
+pub struct NandGate {
+    #[pin(input)]
+    pub in1: bool,
+    #[pin(input)]
+    pub in2: bool,
+    #[pin(output)]
+    pub out: bool,
+}
+
+impl pcb_rs::Chip for NandGate {
+    fn tick(&mut self) {
+        self.out = !self.in1 || !self.in2;
+    }
+}
