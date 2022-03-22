@@ -5,6 +5,8 @@
   import BasicGates from './pages/BasicGates.svelte';
   import RippleAdder from './pages/RippleAdder.svelte';
   import CLAAdder from './pages/CLAAdder.svelte';
+  import Latches from './pages/Latches.svelte';
+  import { bind } from 'svelte/internal';
 
   export let page;
   export let bindings;
@@ -20,6 +22,15 @@
 
   let claAdder = bindings.get_cla_adder_handle();
   let CLAAdderBinding = bindings.CLAAdderBinding;
+
+  let latches = bindings.get_latch_handle();
+  let latch_bindings = {
+    sr: bindings.SRBinding,
+    gsr: bindings.GatedSRBinding,
+    d: bindings.DBinding,
+    t: bindings.TBinding,
+    jk: bindings.JKBinding,
+  };
 </script>
 
 <Content>
@@ -33,6 +44,8 @@
     <RippleAdder {rippleAdder} {RippleAdderBinding} />
   {:else if page == constants.CLA_ADDER_PAGE}
     <CLAAdder {claAdder} {CLAAdderBinding} />
+  {:else if page == constants.LATCHES_PAGE}
+    <Latches {latches} bindings={latch_bindings} />
   {:else if page == constants.CPU_PAGE}
     <CPU {pcb} />
   {:else if page == constants.RING_COUNTER_PAGE}

@@ -48,6 +48,12 @@
       }}
     />
     <SideNavLink
+      text="Latches"
+      on:click={() => {
+        page = constants.LATCHES_PAGE;
+      }}
+    />
+    <SideNavLink
       text="CPU PCB"
       on:click={() => {
         page = constants.CPU_PAGE;
