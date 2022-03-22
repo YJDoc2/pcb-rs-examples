@@ -1,4 +1,4 @@
-use basic_gates::{AndGate, NorGate, NotGate, OrGate};
+use basic_gates::{And3, AndGate, NorGate, NotGate};
 use pcb_rs::pcb;
 
 pcb!(SRLatch{
@@ -88,79 +88,89 @@ impl Default for GatedDLatch {
 }
 
 pcb!(GatedTLatch{
-    chip dlatch;
-    chip and1;
-    chip and2;
-    chip or;
-    chip not;
+    chip and3_1;
+    chip and3_2;
+    chip nor1;
+    chip nor2;
 
-    and1::in1 - dlatch::q;
-    and2::in2 - dlatch::notq;
-    not::out - and1::in2;
-    or::in1 - and1::out;
-    or::in2 - and2::out;
-    or::out - dlatch::d;
+    and3_1::out - nor1::in1;
+    and3_2::out - nor2::in2;
+    nor1::in2 - nor2::out;
+    nor2::in1 - nor1::out;
 
-    expose and2::in1,not::in1 as t;
-    expose dlatch::e as e;
-    expose dlatch::q as q;
-    expose dlatch::notq as notq;
+    nor1::out - and3_1::in1;
+    nor2::out - and3_2::in3;
+
+    expose and3_1::in2, and3_2::in2 as t;
+    expose and3_1::in3,and3_2::in1 as e;
+    expose nor1::out as q;
+    expose nor2::out as notq;
 });
 
 impl Default for GatedTLatch {
     fn default() -> Self {
-        let dlatch = Box::new(GatedDLatch::default());
-        let not = Box::new(NotGate::default());
-        let and1 = Box::new(AndGate::default());
-        let and2 = Box::new(AndGate::default());
-        let or = Box::new(OrGate::default());
-
+        use pcb_rs::Chip;
+        let mut and3_1 = Box::new(And3::default());
+        let and3_2 = Box::new(And3::default());
+        let nor1 = Box::new(NorGate::default());
+        let nor2 = Box::new(NorGate::default());
+        // We have to prime the T latch with a state such that Q and Not Q are valid
+        // i.e. Q = ! notQ, only then T latch will function properly
+        // for that we set the input of 1 nor to be true, other to be false
+        // and propagate those inputs by calling tick()
+        // This way, the T latch is in state where Q = False, notQ = True
+        // and it functions as expected
+        and3_1.in1 = true;
+        and3_1.in2 = true;
+        and3_1.in3 = true;
         let t = GatedTLatchBuilder::new();
-        t.add_chip("dlatch", dlatch)
-            .add_chip("not", not)
-            .add_chip("and1", and1)
-            .add_chip("and2", and2)
-            .add_chip("or", or)
+        let mut l = t
+            .add_chip("and3_1", and3_1)
+            .add_chip("and3_2", and3_2)
+            .add_chip("nor1", nor1)
+            .add_chip("nor2", nor2)
             .build()
-            .unwrap()
+            .unwrap();
+        // propagate the priming values
+        l.tick();
+        l.tick();
+        l
     }
 }
 
 pcb!(GatedJKLatch{
-    chip dlatch;
-    chip and1;
-    chip and2;
-    chip or;
-    chip not;
+    chip and3_1;
+    chip and3_2;
+    chip nor1;
+    chip nor2;
 
-    and1::out - or::in1;
-    and2::out - or::in2;
-    or::out - dlatch::d;
-    and1::in1 - dlatch::notq;
-    and2::in2 - dlatch::q;
-    not::out - and2::in1;
+    and3_1::out - nor1::in1;
+    and3_2::out - nor2::in2;
+    nor1::in2 - nor2::out;
+    nor2::in1 - nor1::out;
 
-    expose and1::in2 as j;
-    expose not::in1 as k;
-    expose dlatch::e as e;
-    expose dlatch::q as q;
-    expose dlatch::notq as notq;
+    nor1::out - and3_1::in1;
+    nor2::out - and3_2::in3;
+
+    expose and3_1::in2 as k;
+    expose and3_2::in2 as j;
+    expose and3_1::in3,and3_2::in1 as e;
+    expose nor1::out as q;
+    expose nor2::out as notq;
 });
 
 impl Default for GatedJKLatch {
     fn default() -> Self {
-        let dlatch = Box::new(GatedDLatch::default());
-        let not = Box::new(NotGate::default());
-        let and1 = Box::new(AndGate::default());
-        let and2 = Box::new(AndGate::default());
-        let or = Box::new(OrGate::default());
+        let and3_1 = Box::new(And3::default());
+        let and3_2 = Box::new(And3::default());
+        let nor1 = Box::new(NorGate::default());
+        let nor2 = Box::new(NorGate::default());
 
         let t = GatedJKLatchBuilder::new();
-        t.add_chip("dlatch", dlatch)
-            .add_chip("not", not)
-            .add_chip("and1", and1)
-            .add_chip("and2", and2)
-            .add_chip("or", or)
+        t.add_chip("and3_1", and3_1)
+            .add_chip("and3_2", and3_2)
+            .add_chip("nor1", nor1)
+            .add_chip("nor2", nor2)
             .build()
             .unwrap()
     }
