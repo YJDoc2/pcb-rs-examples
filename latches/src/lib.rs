@@ -1,4 +1,4 @@
-use basic_gates::{And3, AndGate, NorGate, NotGate};
+use basic_gates::{And3, AndGate, Nor3, NorGate, NotGate};
 use pcb_rs::pcb;
 
 pcb!(SRLatch{
@@ -171,6 +171,48 @@ impl Default for GatedJKLatch {
             .add_chip("and3_2", and3_2)
             .add_chip("nor1", nor1)
             .add_chip("nor2", nor2)
+            .build()
+            .unwrap()
+    }
+}
+
+pcb!(SRDLatch{
+    chip not;
+    chip and1;
+    chip and2;
+    chip nor3_1;
+    chip nor3_2;
+
+    not::out - and1::in1;
+    and1::out - nor3_1::in2;
+    and2::out - nor3_2::in2;
+    nor3_2::out - nor3_1::in3;
+    nor3_1::out - nor3_2::in1;
+
+    expose not::in1,and2::in2 as d;
+    expose and1::in2,and2::in1 as e;
+    expose nor3_1::in1 as s;
+    expose nor3_2::in3 as r;
+    expose nor3_1::out as q;
+    expose nor3_2::out as notq;
+
+
+});
+
+impl Default for SRDLatch {
+    fn default() -> Self {
+        let not = Box::new(NotGate::default());
+        let and1 = Box::new(AndGate::default());
+        let and2 = Box::new(AndGate::default());
+        let nor3_1 = Box::new(Nor3::default());
+        let nor3_2 = Box::new(Nor3::default());
+
+        let t = SRDLatchBuilder::new();
+        t.add_chip("not", not)
+            .add_chip("and1", and1)
+            .add_chip("and2", and2)
+            .add_chip("nor3_1", nor3_1)
+            .add_chip("nor3_2", nor3_2)
             .build()
             .unwrap()
     }

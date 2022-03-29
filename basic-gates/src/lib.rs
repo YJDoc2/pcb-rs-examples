@@ -213,3 +213,21 @@ impl pcb_rs::Chip for NandGate {
         self.out = !self.in1 || !self.in2;
     }
 }
+
+#[derive(Chip, Default)]
+pub struct Nor3 {
+    #[pin(input)]
+    pub in1: bool,
+    #[pin(input)]
+    pub in2: bool,
+    #[pin(input)]
+    pub in3: bool,
+    #[pin(output)]
+    pub out: bool,
+}
+
+impl pcb_rs::Chip for Nor3 {
+    fn tick(&mut self) {
+        self.out = !self.in1 && !self.in2 && !self.in3;
+    }
+}
