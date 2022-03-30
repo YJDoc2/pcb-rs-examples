@@ -8,9 +8,20 @@
 
   let compileErr = false; // need this for textarea
   let compileErrText = '';
-  let code = '';
   let disabled = false;
   let compiled = false;
+
+  let code = `mvi a 0
+mvi b 5
+add
+xchg
+sbi 1
+jz 13
+xchg
+jnz 4
+xchg
+mov 52 a
+hlt`;
 
   let addr_bus = 0;
   let data_bus = 'Tristated';
