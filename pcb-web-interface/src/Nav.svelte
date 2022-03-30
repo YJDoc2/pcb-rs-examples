@@ -4,7 +4,6 @@
     SideNav,
     SideNavItems,
     SideNavLink,
-    SkipToContent,
   } from 'carbon-components-svelte';
   import * as constants from './constants.js';
 
@@ -54,15 +53,15 @@
       }}
     />
     <SideNavLink
-      text="CPU PCB"
-      on:click={() => {
-        page = constants.CPU_PAGE;
-      }}
-    />
-    <SideNavLink
       text="Ring Counter"
       on:click={() => {
         page = constants.RING_COUNTER_PAGE;
+      }}
+    />
+    <SideNavLink
+      text="CPU PCB"
+      on:click={() => {
+        page = constants.CPU_PAGE;
       }}
     />
   </SideNavItems>

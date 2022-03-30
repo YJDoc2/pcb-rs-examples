@@ -7,13 +7,18 @@ pcb!(OneHotCounter{
     chip d3;
     chip d4;
 
-    d1::q -d2::d;
+    d1::q - d2::d;
     d2::q - d3::d;
     d3::q - d4::d;
     d4::q - d1::d;
 
     expose d1::e,d2::e,d3::e,d4::e as e;
-    expose d1::p,d2::r,d3::r,d4::r as r;
+    expose d1::s,d2::r,d3::r,d4::r as r;
+    expose d1::q as q1;
+    expose d2::q as q2;
+    expose d3::q as q3;
+    expose d4::q as q4;
+
 });
 
 impl Default for OneHotCounter {
@@ -46,6 +51,10 @@ pcb!(JohnsonRingCounter {
 
     expose d1::e,d2::e,d3::e,d4::e as e;
     expose d1::r,d2::r,d3::r,d4::r as r;
+    expose d1::q as q1;
+    expose d2::q as q2;
+    expose d3::q as q3;
+    expose d4::q as q4;
 
 });
 

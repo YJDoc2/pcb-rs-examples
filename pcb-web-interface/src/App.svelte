@@ -1,10 +1,10 @@
 <script>
   export let bindings;
-  import { HOME_PAGE, LATCHES_PAGE } from './constants';
+  import { HOME_PAGE, RING_COUNTER_PAGE } from './constants';
   import Nav from './Nav.svelte';
   import Content from './Content.svelte';
 
-  let page = LATCHES_PAGE;
+  let page = RING_COUNTER_PAGE;
 </script>
 
 <Nav bind:page />

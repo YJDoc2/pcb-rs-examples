@@ -6,7 +6,7 @@
   import RippleAdder from './pages/RippleAdder.svelte';
   import CLAAdder from './pages/CLAAdder.svelte';
   import Latches from './pages/Latches.svelte';
-  import { bind } from 'svelte/internal';
+  import RingCounter from './pages/RingCounter.svelte';
 
   export let page;
   export let bindings;
@@ -31,6 +31,9 @@
     t: bindings.TBinding,
     jk: bindings.JKBinding,
   };
+  console.log(bindings.get_counter_handle);
+  let counter = bindings.get_counter_handle();
+  let CounterBinding = bindings.CounterBinding;
 </script>
 
 <Content>
@@ -46,10 +49,10 @@
     <CLAAdder {claAdder} {CLAAdderBinding} />
   {:else if page == constants.LATCHES_PAGE}
     <Latches {latches} bindings={latch_bindings} />
+  {:else if page == constants.RING_COUNTER_PAGE}
+    <RingCounter {counter} {CounterBinding} />
   {:else if page == constants.CPU_PAGE}
     <CPU {pcb} />
-  {:else if page == constants.RING_COUNTER_PAGE}
-    <h1>Ring Counter page</h1>
   {:else}
     <h1>unicorn page</h1>
   {/if}

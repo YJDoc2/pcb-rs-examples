@@ -16,6 +16,7 @@ basic-gates = {path="../basic-gates"}
 ripple-carry-adder = {path="../ripple-carry-adder"}
 cla-adder = {path = "../cla-adder"}
 latches = {path="../latches"}
+ring-counter = {path="../ring-counter"}
 
 
 

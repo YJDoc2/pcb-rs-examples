@@ -191,8 +191,8 @@ pcb!(SRDLatch{
 
     expose not::in1,and2::in2 as d;
     expose and1::in2,and2::in1 as e;
-    expose nor3_1::in1 as s;
-    expose nor3_2::in3 as r;
+    expose nor3_1::in1 as r;
+    expose nor3_2::in3 as s;
     expose nor3_1::out as q;
     expose nor3_2::out as notq;
 
