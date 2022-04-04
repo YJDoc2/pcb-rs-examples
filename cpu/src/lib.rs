@@ -27,9 +27,6 @@ use std::collections::VecDeque;
 
 // 255 : nop
 
-// TODO
-// port these to compiler.js as well
-
 const INSTRUCTION_CACHE_LENGTH: usize = 8;
 
 // the u8 stores ram address that is being fetched
