@@ -12,7 +12,7 @@
   let isSideNavOpen = false;
 </script>
 
-<Header company="PCB-rs" platformName="Web Interface" bind:isSideNavOpen />
+<Header company="PCB-RS" platformName="Web Interface" bind:isSideNavOpen />
 <SideNav bind:isOpen={isSideNavOpen}>
   <SideNavItems>
     <SideNavLink

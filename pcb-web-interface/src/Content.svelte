@@ -7,6 +7,8 @@
   import CLAAdder from './pages/CLAAdder.svelte';
   import Latches from './pages/Latches.svelte';
   import RingCounter from './pages/RingCounter.svelte';
+  import HomePage from './pages/HomePage.svelte';
+  import InfoPage from './pages/InfoPage.svelte';
 
   export let page;
   export let bindings;
@@ -38,9 +40,9 @@
 
 <Content>
   {#if page == constants.HOME_PAGE}
-    <h1>Home Page</h1>
+    <HomePage />
   {:else if page == constants.INFO_PAGE}
-    <h1>Info Page</h1>
+    <InfoPage />
   {:else if page == constants.GATES_PAGE}
     <BasicGates {gates} {GatesBinding} />
   {:else if page == constants.RIPPLE_ADDER_PAGE}
