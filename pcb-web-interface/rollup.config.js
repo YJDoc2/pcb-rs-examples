@@ -44,7 +44,7 @@ export default {
   plugins: [
     rust({
       verbose: true,
-      serverPath: '/build/',
+      serverPath: '/pcb-rs-examples/build/',
     }),
     svelte({
       compilerOptions: {

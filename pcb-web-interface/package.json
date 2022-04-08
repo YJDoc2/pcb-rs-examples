@@ -2,7 +2,9 @@
   "name": "svelte-app",
   "version": "1.0.0",
   "private": true,
+  "homepage": "https://yjdoc2.github.io/pcb-rs-examples/",
   "scripts": {
+    "deploy": "gh-pages -d public -b deploy --remote github",
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "start": "sirv public --no-clear"
@@ -13,6 +15,7 @@
     "@wasm-tool/rollup-plugin-rust": "^1.0.7",
     "carbon-components-svelte": "^0.59.0",
     "carbon-icons-svelte": "^10.44.4",
+    "gh-pages": "^3.2.3",
     "rollup": "^2.3.4",
     "rollup-plugin-css-only": "^3.1.0",
     "rollup-plugin-livereload": "^2.0.0",

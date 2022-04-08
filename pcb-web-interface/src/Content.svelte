@@ -33,7 +33,6 @@
     t: bindings.TBinding,
     jk: bindings.JKBinding,
   };
-  console.log(bindings.get_counter_handle);
   let counter = bindings.get_counter_handle();
   let CounterBinding = bindings.CounterBinding;
 </script>
