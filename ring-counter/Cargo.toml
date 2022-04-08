@@ -7,5 +7,5 @@ edition = "2021"
 
 [dependencies]
 basic-gates = {path ="../basic-gates"}
-pcb-rs = {path="../../pcb-rs/pcb-rs"}
+pcb-rs = {path="../../pcb-rs/crates/pcb-rs"}
 latches = {path="../latches"}

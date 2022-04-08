@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 full-adder = {path = "../full-adder"}
-pcb-rs = {path="../../pcb-rs/pcb-rs"}
+pcb-rs = {path="../../pcb-rs/crates/pcb-rs"}

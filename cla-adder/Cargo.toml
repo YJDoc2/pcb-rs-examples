@@ -8,4 +8,4 @@ edition = "2021"
 [dependencies]
 basic-gates = {path ="../basic-gates"}
 full-adder = {path = "../full-adder"}
-pcb-rs = {path="../../pcb-rs/pcb-rs"}
+pcb-rs = {path="../../pcb-rs/crates/pcb-rs"}

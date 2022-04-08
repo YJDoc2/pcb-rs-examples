@@ -26,7 +26,7 @@ dependencies = [
 
 [[package]]
 name = "pcb-rs"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "pcb-rs-macros",
  "pcb-rs-traits",
@@ -34,7 +34,7 @@ dependencies = [
 
 [[package]]
 name = "pcb-rs-macros"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "pcb-rs-traits",
  "proc-macro2",
@@ -44,7 +44,7 @@ dependencies = [
 
 [[package]]
 name = "pcb-rs-traits"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "downcast-rs",
 ]

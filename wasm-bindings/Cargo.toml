@@ -9,7 +9,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 wasm-bindgen = "0.2.63"
-pcb-rs = {path="../../pcb-rs/pcb-rs"}
+pcb-rs = {path="../../pcb-rs/crates/pcb-rs"}
 cpu = {path="../cpu"}
 ram = {path="../ram"}
 basic-gates = {path="../basic-gates"}
